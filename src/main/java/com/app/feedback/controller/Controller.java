@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,11 +43,13 @@ public class Controller {
 
     //Create Form API
     @PostMapping("/form")
-    public FormResponse addform(@RequestBody FormRequest creatForm, @RequestParam("id") int user_id){
+    public ResponseEntity<String> addform(@RequestBody FormRequest creatForm, @RequestParam("id") int user_id){
      
-        User current_user = userRepository.getReferenceById(user_id);
+        try {
+            User current_user = userRepository.getReferenceById(user_id);
         Form newform = new Form();
         newform.setName(creatForm.getName());
+
         List<Question> nQuestion = new ArrayList<>();
         List<QuestionRequest> questionRequests = creatForm.getQuestions();
         for(QuestionRequest qr : questionRequests){
@@ -65,36 +69,53 @@ public class Controller {
         
         newform.setCreatedBy(current_user);
         newform.setQuestions(nQuestion);
+
+        fromRepository.save(newform);
         
-        Form savedForm = fromRepository.save(newform);
+        //Form savedForm = fromRepository.save(newform);
 
-        FormResponse sendForm = new FormResponse();
-        sendForm.setFrom_id(savedForm.getId());
-        sendForm.setName(savedForm.getName());
-        sendForm.setQuestions(savedForm.getQuestions());
-        sendForm.setUser(savedForm.getCreatedBy());
+        // FormResponse sendForm = new FormResponse();
+        // sendForm.setFrom_id(savedForm.getId());
+        // sendForm.setName(savedForm.getName());
+        // sendForm.setQuestions(savedForm.getQuestions());
+        // sendForm.setUser(savedForm.getCreatedBy());
 
-        return sendForm;
+        return ResponseEntity.ok("form Saved");
+        } catch (Exception e) {
+            
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        
+
+        
         
 
    }
    
    //submitFormAPI
    @PostMapping("/response")
-   public String saveAllResponse(@RequestBody ResponseRequest responseRequest, @RequestParam("user_id") int user_id, @RequestParam("form_id") int form_id){
-        
-      Response newResponse = new Response();
+   public ResponseEntity<String> saveAllResponse(@RequestBody ResponseRequest responseRequest, @RequestParam("user_id") int user_id, @RequestParam("form_id") int form_id){
+       try {
+        Response newResponse = new Response();
       newResponse.setForm_id(form_id);
       newResponse.setUser_id(user_id);
       newResponse.setResponseBody(responseRequest.getQuestionAnswers());
       responseRepository.save(newResponse);
-      return "added";
+      return ResponseEntity.ok("Response Saved");
+       } catch (Exception e) {
+       
+        e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+       } 
+      
    }
   
 
    //to add user to database
    @PostMapping("/addUser")
     public UserResponse addUser(@RequestBody UserRequest first){
+
         User newUser = new User();
         newUser.setName(first.getName());
         newUser.setEmail(first.getEmail());
