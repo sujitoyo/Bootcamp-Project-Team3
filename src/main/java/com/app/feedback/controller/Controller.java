@@ -1,154 +1,170 @@
 package com.app.feedback.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.app.feedback.dto.FormBody;
 import com.app.feedback.dto.FormRequest;
 import com.app.feedback.dto.FormResponse;
-import com.app.feedback.dto.QuestionRequest;
+import com.app.feedback.dto.LoginRequest;
+import com.app.feedback.dto.ProfileBody;
+import com.app.feedback.dto.QuestionResponse;
+import com.app.feedback.dto.ReportBody;
 import com.app.feedback.dto.ResponseRequest;
 import com.app.feedback.dto.UserRequest;
 import com.app.feedback.dto.UserResponse;
-import com.app.feedback.entity.Form;
-import com.app.feedback.entity.Question;
-import com.app.feedback.entity.QuetionType;
-import com.app.feedback.entity.Response;
-import com.app.feedback.entity.User;
-import com.app.feedback.repository.FromRepository;
-import com.app.feedback.repository.ResponseRepository;
-import com.app.feedback.repository.UserRepository;
+import com.app.feedback.sevices.AllService;
 
 @RestController
 public class Controller {
     
     @Autowired
-    private UserRepository userRepository;
+    private AllService allService;
 
-    @Autowired
-    private FromRepository fromRepository;
+   
+    @GetMapping("/login")
+    public ResponseEntity<Integer> getLogin(@RequestBody LoginRequest loginreq) {
 
-    @Autowired
-    private ResponseRepository responseRepository;
+        try {
+            
+            if (allService.loginauth(loginreq) != 0) {
+                return ResponseEntity.ok(allService.loginauth(loginreq));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/profilepage") 
+    public ResponseEntity<ProfileBody> getAllProfileInfo(@RequestParam("user_id") int user_id){
+        try {
+
+            ProfileBody sendData = allService.getAllForms(user_id);    
+            return ResponseEntity.ok(sendData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    //view Report API
+    @GetMapping("/viewreport")
+    public ResponseEntity<ReportBody> currentReport(@RequestParam("form_id") int form_id){
+        try {
+            ReportBody sBody = allService.viewReport(form_id);
+            return ResponseEntity.ok(sBody);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     //Create Form API
-    @PostMapping("/form")
-    public ResponseEntity<String> addform(@RequestBody FormRequest creatForm, @RequestParam("id") int user_id){
+    @PostMapping("/createform")
+    public ResponseEntity<FormBody> createform(@RequestBody FormRequest creatForm, @RequestParam("id") int user_id){
      
         try {
-            User current_user = userRepository.getReferenceById(user_id);
-        Form newform = new Form();
-        newform.setName(creatForm.getName());
 
-        List<Question> nQuestion = new ArrayList<>();
-        List<QuestionRequest> questionRequests = creatForm.getQuestions();
-        for(QuestionRequest qr : questionRequests){
-            Question newQuestion = new Question();
-            System.out.println(qr.getQuetionType());
-            if(qr.getQuetionType() == "OBJECTIVE")
-            newQuestion.setQuetionType(QuetionType.OBJECTIVE);
-  
-            else
-            newQuestion.setQuetionType(QuetionType.SUBJECTIVE);
+            FormBody sendForm = allService.addform(creatForm, user_id);
+            return ResponseEntity.ok(sendForm);
 
-            newQuestion.setAnswers(qr.getAnswers());
-            newQuestion.setText(qr.getText());
-            nQuestion.add(newQuestion);
-
-        }
-        
-        newform.setCreatedBy(current_user);
-        newform.setQuestions(nQuestion);
-
-        fromRepository.save(newform);
-        
-        //Form savedForm = fromRepository.save(newform);
-
-        // FormResponse sendForm = new FormResponse();
-        // sendForm.setFrom_id(savedForm.getId());
-        // sendForm.setName(savedForm.getName());
-        // sendForm.setQuestions(savedForm.getQuestions());
-        // sendForm.setUser(savedForm.getCreatedBy());
-
-        return ResponseEntity.ok("form Saved");
         } catch (Exception e) {
             
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         
-
-        
-        
-
    }
+
+
+   //fill response Api
+   @GetMapping("/fillresponse")
+   public ResponseEntity<FormResponse> fillResponse(@RequestParam("form_id") int form_id){
+
+      try {
+       
+            FormResponse sendForm = allService.formDetails(form_id);
+            return ResponseEntity.ok(sendForm);
+
+      } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+      }
+         
+   }
+
    
    //submitFormAPI
-   @PostMapping("/response")
-   public ResponseEntity<String> saveAllResponse(@RequestBody ResponseRequest responseRequest, @RequestParam("user_id") int user_id, @RequestParam("form_id") int form_id){
+   @PostMapping("/submitform")
+   public ResponseEntity<FormBody> submitForm(@RequestBody ResponseRequest responseRequest, @RequestParam("user_id") int user_id, @RequestParam("form_id") int form_id){
        try {
-        Response newResponse = new Response();
-      newResponse.setForm_id(form_id);
-      newResponse.setUser_id(user_id);
-      newResponse.setResponseBody(responseRequest.getQuestionAnswers());
-      responseRepository.save(newResponse);
-      return ResponseEntity.ok("Response Saved");
+       
+            FormBody sendResBody = new FormBody();
+            return ResponseEntity.ok(sendResBody);
+
        } catch (Exception e) {
        
-        e.printStackTrace();
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
        } 
       
    }
   
+   //view form API
+   @GetMapping("/viewresponse")
+   public ResponseEntity<List<QuestionResponse>> getResponse(@RequestParam("response_id") int response_id){
+
+    try {
+        
+            List<QuestionResponse> sendResponse = allService.viewResponse(response_id);
+            return ResponseEntity.ok(sendResponse);
+
+    } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+   }
+    
 
    //to add user to database
    @PostMapping("/addUser")
-    public UserResponse addUser(@RequestBody UserRequest first){
+    public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest first){
 
-        User newUser = new User();
-        newUser.setName(first.getName());
-        newUser.setEmail(first.getEmail());
+       try {
+        UserResponse sendUserResponse = new UserResponse(); 
+        return ResponseEntity.ok(sendUserResponse);
 
-        User addedUser =userRepository.save(newUser);
-        UserResponse sendUserResponse = new UserResponse();
-        sendUserResponse.setId(addedUser.getId());
-        sendUserResponse.setEmail(addedUser.getEmail());
-        sendUserResponse.setName(addedUser.getName());
-        
-        return sendUserResponse;
+       } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+       }
     }
 
     @GetMapping("/users")
-    public List<UserResponse> getAllUser(){
+    public ResponseEntity<List<UserResponse>> getUsers(){
 
-        List<User> users = userRepository.findAll();
-        List<UserResponse> allusers = new ArrayList<UserResponse>();
+        try {
+            List<UserResponse> allusers = allService.getAllUser();
+            return ResponseEntity.ok(allusers);
 
-        for(User user: users){
-           UserResponse a = new UserResponse();
-           a.setId(user.getId());
-           a.setEmail(user.getEmail());
-           a.setName(user.getName());
-           allusers.add(a);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        return allusers;
     }
 
-    @DeleteMapping("user/{id}")
-    public void Deleteuser(@PathVariable int id){
-        userRepository.deleteById(id);
-    }
 
 }

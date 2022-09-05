@@ -2,6 +2,9 @@ package com.app.feedback.dto;
 
 import java.util.List;
 
+import com.app.feedback.entity.QuetionType;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,8 +18,8 @@ public class QuestionRequest {
     
     private String text;
 
-   
-    private String quetionType;
+   @JsonProperty("question_type")
+    private QuetionType questionType;
   
     private List<String> answers;
 

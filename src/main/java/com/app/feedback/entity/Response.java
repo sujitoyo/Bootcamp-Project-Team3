@@ -11,6 +11,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.PrePersist;
@@ -30,21 +31,22 @@ import lombok.ToString;
 public class Response {
     
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "response_id")
     private int id;
     
-    
-    private int form_id;
+    @Column(name = "form_id")
+    private int formId;
 
-    
-    private int user_id;
+    @Column(name = "user_id")
+    private int userId;
 
     @Column
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "QuestionsAndAnswers", joinColumns = @JoinColumn(name = "response_id"))
     private List<StoreResponse> responseBody = new ArrayList<>();
 
+    
     @Temporal(TemporalType.DATE)
     private Date submittedOn;
 

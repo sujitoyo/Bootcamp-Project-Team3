@@ -6,5 +6,5 @@ import com.app.feedback.entity.User;
 
 public interface UserRepository extends JpaRepository< User, Integer>{
 
-    
+    public User findByEmail(String email);
 } 

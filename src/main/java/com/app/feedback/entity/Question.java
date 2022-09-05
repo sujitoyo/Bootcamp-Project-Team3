@@ -12,11 +12,14 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,11 +35,11 @@ import lombok.ToString;
 public class Question {
     
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column (name = "question_id")
     private int id;
     
-
+    @Column(name = "question_text")
     private String text;
 
     @Enumerated(EnumType.ORDINAL)
@@ -53,7 +56,8 @@ public class Question {
     private void onCreate(){
         createdAt = new Date();
     }
-
+    
+    @JsonBackReference
     @ManyToMany(mappedBy = "questions" , fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Form> forms = new ArrayList<>();
 }
