@@ -51,15 +51,23 @@ public class AllService {
     private QuestionRepository questionRepository;
 
 
-    public Integer loginauth(LoginRequest loginreq) {
+    public UserResponse loginauth(LoginRequest loginreq) {
 
-            Optional<User> xyz = Optional.ofNullable(userRepository.findByEmail(loginreq.getEmail()));
-            User abc=userRepository.findByEmail(loginreq.getEmail());
-            if (xyz.isPresent()) {
-                return abc.getId();
-            } else {
-                return 0;
-            }
+        Optional<User> xyz = Optional.ofNullable(userRepository.findByEmail(loginreq.getEmail()));
+        User abc=userRepository.findByEmail(loginreq.getEmail());
+        if (xyz.isPresent()) {
+            UserResponse currentresponse=new UserResponse();
+            currentresponse.setId(abc.getId());
+            currentresponse.setName(abc.getName());
+            currentresponse.setEmail(abc.getEmail());
+            return currentresponse;
+        } else {
+            UserResponse currentresponse=new UserResponse();
+            currentresponse.setId(0);
+            currentresponse.setName("");
+            currentresponse.setEmail("");
+            return currentresponse;
+        }
         
     }
 
@@ -229,9 +237,9 @@ public class AllService {
       newResponse.setFormId(form_id);
       newResponse.setUserId(user_id);
       newResponse.setResponseBody(responseRequest.getQuestionAnswers());
-      Response savedrResponse = responseRepository.save(newResponse);
+      Response savedResponse = responseRepository.save(newResponse);
       FormBody sendResBody = new FormBody();
-      sendResBody.setId(savedrResponse.getId());
+      sendResBody.setId(savedResponse.getId());
       sendResBody.setName(currentForm.getName());
 
       return sendResBody;
@@ -253,6 +261,7 @@ public class AllService {
             QuestionResponse newResponse = new QuestionResponse();
             newResponse.setAnswer(ans);
             newResponse.setOptions(getQuestion.getAnswers());
+            newResponse.setQuestionType(getQuestion.getQuetionType().toString());
             newResponse.setQuestionText(questionText);
             newResponse.setQuestion_id(question_id);
             sendResponse.add(newResponse);

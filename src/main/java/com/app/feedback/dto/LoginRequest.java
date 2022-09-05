@@ -1,4 +1,4 @@
-package com.app.feedback.controller;
+package com.app.feedback.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

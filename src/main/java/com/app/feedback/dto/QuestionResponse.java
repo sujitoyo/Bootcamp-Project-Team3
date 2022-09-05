@@ -18,5 +18,6 @@ public class QuestionResponse {
     private int question_id;
     private String QuestionText;
     private String answer;
+    private String questionType;
     private List<String> options;
 }

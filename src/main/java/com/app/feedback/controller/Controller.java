@@ -31,12 +31,12 @@ public class Controller {
 
    
     @GetMapping("/login")
-    public ResponseEntity<Integer> getLogin(@RequestBody LoginRequest loginreq) {
+    public ResponseEntity<UserResponse> getLogin(@RequestBody LoginRequest loginreq) {
 
         try {
-            
-            if (allService.loginauth(loginreq) != 0) {
-                return ResponseEntity.ok(allService.loginauth(loginreq));
+            UserResponse sendResponse=allService.loginauth(loginreq);
+            if (sendResponse.getId()!=0) {
+                return ResponseEntity.ok(sendResponse);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
@@ -112,7 +112,7 @@ public class Controller {
    public ResponseEntity<FormBody> submitForm(@RequestBody ResponseRequest responseRequest, @RequestParam("user_id") int user_id, @RequestParam("form_id") int form_id){
        try {
        
-            FormBody sendResBody = new FormBody();
+            FormBody sendResBody = allService.saveAllResponse(responseRequest, user_id, form_id);
             return ResponseEntity.ok(sendResBody);
 
        } catch (Exception e) {
@@ -144,7 +144,7 @@ public class Controller {
     public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest first){
 
        try {
-        UserResponse sendUserResponse = new UserResponse(); 
+        UserResponse sendUserResponse = allService.addUser(first); 
         return ResponseEntity.ok(sendUserResponse);
 
        } catch (Exception e) {
