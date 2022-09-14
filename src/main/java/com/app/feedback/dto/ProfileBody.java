@@ -1,5 +1,6 @@
 package com.app.feedback.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ProfileBody {
+public class ProfileBody implements Serializable{
     private List<FormBody> createdByUser;
     private List<FormBody> filledByUser;
     private List<FormBody> notFilledByUser;

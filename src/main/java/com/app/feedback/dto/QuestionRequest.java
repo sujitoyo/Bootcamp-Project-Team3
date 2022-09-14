@@ -2,7 +2,7 @@ package com.app.feedback.dto;
 
 import java.util.List;
 
-import com.app.feedback.entity.QuetionType;
+import com.app.feedback.entity.QuestionType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ public class QuestionRequest {
     private String text;
 
    @JsonProperty("question_type")
-    private QuetionType questionType;
+    private QuestionType questionType;
   
     private List<String> answers;
 

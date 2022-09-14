@@ -41,8 +41,10 @@ public class Form implements Serializable{
     @Column(name = "form_id")
     private int id;
 
+    @Column(length = 100)
     private String name;
 
+    //sets date automatically
     @Temporal(TemporalType.DATE)
     private Date createdAt;
 
@@ -51,7 +53,7 @@ public class Form implements Serializable{
         createdAt = new Date();
     }
    
-    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User createdBy;
 

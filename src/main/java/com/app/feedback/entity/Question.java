@@ -39,13 +39,13 @@ public class Question {
     @Column (name = "question_id")
     private int id;
     
-    @Column(name = "question_text")
+    @Column(name = "question_text", length = 1000)
     private String text;
 
     @Enumerated(EnumType.ORDINAL)
-    private QuetionType quetionType;
+    private QuestionType quetionType;
     
-    @Column
+    @Column(length = 1000)
     @ElementCollection
     private List<String> answers = new ArrayList<String>();
 

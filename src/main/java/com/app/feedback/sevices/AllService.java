@@ -9,7 +9,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import com.app.feedback.dto.FormBody;
 import com.app.feedback.dto.FormRequest;
@@ -55,7 +56,7 @@ public class AllService {
 
         Optional<User> xyz = Optional.ofNullable(userRepository.findByEmail(loginreq.getEmail()));
         User abc=userRepository.findByEmail(loginreq.getEmail());
-        if (xyz.isPresent()) {
+        if (xyz.isPresent() && loginreq.getPassword() == 1234) {
             UserResponse currentresponse=new UserResponse();
             currentresponse.setId(abc.getId());
             currentresponse.setName(abc.getName());
@@ -70,8 +71,11 @@ public class AllService {
         }
         
     }
-
+   
+    @Cacheable(value = "profile" , key = "#user_id")
     public ProfileBody getAllForms(int user_id){
+
+            ProfileBody sendData = new ProfileBody();
             
             User currentUser = userRepository.getReferenceById(user_id);
 
@@ -122,7 +126,7 @@ public class AllService {
 
             }
 
-            ProfileBody sendData = new ProfileBody();
+            
             sendData.setCreatedByUser(userCreated);
             sendData.setFilledByUser(userSubmitted);
             sendData.setNotFilledByUser(remainingForms);
@@ -154,6 +158,8 @@ public class AllService {
                     String answerText = ca.getResponseText();
                     ResponseBody currentRBody = new ResponseBody();
                     currentRBody.setAnswer(answerText);
+                    currentRBody.setOptions(question.getAnswers());
+                    currentRBody.setQuestionType(question.getQuetionType());
                     currentRBody.setQuestion(questionText);
                     newResponseBody.add(currentRBody);
 
@@ -174,7 +180,7 @@ public class AllService {
        
     }
 
-    
+    @CacheEvict(value = "profile" , allEntries = true, key = "#user_id")
     public FormBody addform(FormRequest creatForm,int user_id){
      
             User current_user = userRepository.getReferenceById(user_id);
@@ -206,15 +212,14 @@ public class AllService {
         sendForm.setId(savedForm.getId());
         //sendForm.setUser(savedForm.getCreatedBy());
 
+         
+
         return sendForm;
-        
         
    }
 
-
-  
    
-   public FormResponse formDetails(int form_id){
+    public FormResponse formDetails(int form_id){
 
      
        Form savedForm = formRepository.getReferenceById(form_id);
@@ -228,8 +233,8 @@ public class AllService {
          
    }
 
-  
-   public FormBody saveAllResponse(ResponseRequest responseRequest, int user_id, int form_id){
+    @CacheEvict(value = "profile" , allEntries = true, key = "#user_id")
+    public FormBody saveAllResponse(ResponseRequest responseRequest, int user_id, int form_id){
       
         Response newResponse = new Response();
         Form currentForm = formRepository.getReferenceById(form_id);
@@ -248,7 +253,7 @@ public class AllService {
    }
   
    
-   public List<QuestionResponse> viewResponse(int response_id){
+    public List<QuestionResponse> viewResponse(int response_id){
 
         Response getresponse = responseRepository.getReferenceById(response_id);
         List<QuestionResponse> sendResponse = new ArrayList<>();
@@ -273,7 +278,7 @@ public class AllService {
    }
     
 
-   public UserResponse addUser(UserRequest first){
+    public UserResponse addUser(UserRequest first){
 
         User newUser = new User();
         newUser.setName(first.getName());

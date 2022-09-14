@@ -30,7 +30,7 @@ public class Controller {
     private AllService allService;
 
    
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<UserResponse> getLogin(@RequestBody LoginRequest loginreq) {
 
         try {
@@ -50,7 +50,7 @@ public class Controller {
     public ResponseEntity<ProfileBody> getAllProfileInfo(@RequestParam("user_id") int user_id){
         try {
 
-            ProfileBody sendData = allService.getAllForms(user_id);    
+            ProfileBody sendData = allService.getAllForms(user_id); 
             return ResponseEntity.ok(sendData);
 
         } catch (Exception e) {
