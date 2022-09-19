@@ -53,7 +53,7 @@ public class Form implements Serializable{
         createdAt = new Date();
     }
    
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User createdBy;
 
